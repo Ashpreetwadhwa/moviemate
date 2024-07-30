@@ -20,19 +20,13 @@ with h5py.File('similarity.h5', 'r') as hf:
     loaded_similarity = hf['similarity'][:]
 similarity=loaded_similarity
 
-def fetch_poster(movie_id):
-    try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US"
-        data = requests.get(url).json()
-        poster_path = data.get('poster_path')
-        if poster_path:
-            full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
-            return full_path
-        else:
-            return "https://via.placeholder.com/500x750?text=No+Image+Available"
-    except Exception as e:
-        st.error(f"Error fetching poster: {e}")
-        return "https://via.placeholder.com/500x750?text=Error+Fetching+Image"
+def fetch_poster(movie_title):
+    title=movie_title.strip()
+    url = f"https://www.omdbapi.com/?t={title}&apikey=f0d9ae9e"
+    data = requests.get(url)
+    data = data.json()
+    poster_path = data['Poster']
+    return poster_path
 
 # Function to recommend movies
 def recommend(movie):
@@ -43,10 +37,10 @@ def recommend(movie):
         recommended_movie_posters = []
         for i in distances[1:6]:  # Skip the first index as it is the movie itself
             movie_id = i[0]  # Use .get to avoid KeyError
-
+            movie_title=movies.iloc[i[0]].get('title', 'Unknown Title')
             if pd.notna(movie_id):  # Check if movie_id is not NaN
-                recommended_movie_posters.append("https://via.placeholder.com/500x750?text=No+Image+Available")
-                recommended_movie_names.append(movies.iloc[i[0]].get('title', 'Unknown Title'))
+                recommended_movie_posters.append(fetch_poster(movie_title))
+                recommended_movie_names.append(movie_title)
             else:
                 recommended_movie_names.append('Unknown Title')
                 recommended_movie_posters.append("https://via.placeholder.com/500x750?text=No+Image+Available")
