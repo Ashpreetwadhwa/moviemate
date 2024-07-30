@@ -4,6 +4,13 @@ import streamlit as st
 import requests
 
 # Function to fetch poster
+import h5py
+
+import numpy as np
+with h5py.File('similarity.h5', 'r') as hf:
+    loaded_similarity = hf['similarity'][:]
+similarity=loaded_similarity
+
 def fetch_poster(movie_id):
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US"
@@ -27,6 +34,7 @@ def recommend(movie):
         recommended_movie_posters = []
         for i in distances[1:6]:  # Skip the first index as it is the movie itself
             movie_id = i[0]  # Use .get to avoid KeyError
+
             if pd.notna(movie_id):  # Check if movie_id is not NaN
                 recommended_movie_posters.append("https://via.placeholder.com/500x750?text=No+Image+Available")
                 recommended_movie_names.append(movies.iloc[i[0]].get('title', 'Unknown Title'))
@@ -47,8 +55,7 @@ with open('movies_dict.pkl', 'rb') as f:
     movies_dict = pickle.load(f)
     movies = pd.DataFrame(movies_dict)
 
-with open('similarity.pkl', 'rb') as f:
-    similarity = pickle.load(f)
+
 
 # Extract movie titles and convert to list
 movie_list = movies['title']  # Convert to list
