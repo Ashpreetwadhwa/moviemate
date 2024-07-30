@@ -3,7 +3,16 @@ import pandas as pd
 import streamlit as st
 import requests
 
-# Function to fetch poster
+import gdown
+import h5py
+
+# Google Drive file ID
+file_id = '1so01bfu-Wz6kOpBTKibUOQ4TOI9zEOJQ'
+# URL to download the file from Google Drive
+url = f'https://drive.google.com/uc?id={file_id}'
+# Download the file
+output = 'similarity.h5'
+gdown.download(url, output, quiet=False)
 import h5py
 
 import numpy as np
